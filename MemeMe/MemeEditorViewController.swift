@@ -42,25 +42,20 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
         NSAttributedStringKey.font.rawValue: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
         NSAttributedStringKey.strokeWidth.rawValue: -3.1]
     
- 
+    // image Picker controller to get image from album and camera
+    var imagePicker = UIImagePickerController ()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-
-        //initial setting for top text field
-        topTextField.defaultTextAttributes = memeTextAttributes
-        topTextField.text = "TOP"
-        topTextField.textAlignment = .center
-        topTextField.contentVerticalAlignment = .center
-        topTextField.delegate = self
-        //initial setting for bottom text field
-        bottomTextField.defaultTextAttributes = memeTextAttributes
-        bottomTextField.text = "BOTTOM"
-        bottomTextField.textAlignment = .center
-        bottomTextField.contentVerticalAlignment = .center
-        bottomTextField.delegate = self
+       
+        imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
         
+           //initial setting for text field
+        setTextFieldValue(TxtField: topTextField,txt: "TOP")
+        setTextFieldValue(TxtField: bottomTextField,txt: "BOTTOM")
+       
         // disabling share button until user pick an image
          shareButton.isEnabled = false
     }
@@ -69,9 +64,17 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
         // disabling camera button for devices that dosnt have one
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
         
-        //Handleing Keyboard Notifications
-        subscribeToKeyboardNotifications()
+      
 
+    }
+    //initial setting for text field
+    func setTextFieldValue(TxtField : UITextField , txt : String){
+        
+        TxtField.defaultTextAttributes = memeTextAttributes
+        TxtField.text = txt
+        TxtField.textAlignment = .center
+        TxtField.contentVerticalAlignment = .center
+        TxtField.delegate = self
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -83,8 +86,7 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
 
     
     @IBAction func pickAnImageFromAlbum(_ sender: Any) {
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
+       
         imagePicker.sourceType = .photoLibrary
         present(imagePicker, animated: true, completion: nil)
     }
@@ -102,8 +104,6 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
     }
     
     @IBAction func pickAnImageFromCamera(_ sender: Any) {
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
         imagePicker.sourceType = .camera
         present(imagePicker, animated: true, completion: nil)
     }
@@ -114,17 +114,23 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
         {
             textField.text = ""
         }
+        if (textField == bottomTextField){
+            subscribeToKeyboardNotifications()
+       }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        if (textField == bottomTextField){
+            unsubscribeFromKeyboardNotifications()
+        }
         return true
     }
     
     func subscribeToKeyboardNotifications() {
-        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
-          NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
+        
     }
     
     func unsubscribeFromKeyboardNotifications() {
@@ -200,5 +206,7 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
     imagePickerView.image = nil
    shareButton.isEnabled = false
     }
+    
+
 }
 
