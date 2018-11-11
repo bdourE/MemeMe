@@ -8,12 +8,7 @@
 
 import UIKit
 
-struct Meme {
-    var topText : String?
-    var bottomText : String?
-    var originalImage : UIImage?
-    var memedImage : UIImage?
-}
+
 
 class MemeEditorViewController : UIViewController , UIImagePickerControllerDelegate ,UINavigationControllerDelegate ,UITextFieldDelegate{
     
@@ -35,6 +30,7 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
     // image after rendering to view
     var  memedImg : UIImage!
     
+    var meme : Meme!
     // dictionary for text property
     let memeTextAttributes:[String: Any] = [
         NSAttributedStringKey.strokeColor.rawValue: UIColor.black,
@@ -53,11 +49,26 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
         imagePicker.delegate = self
         
            //initial setting for text field
-        setTextFieldValue(TxtField: topTextField,txt: "TOP")
-        setTextFieldValue(TxtField: bottomTextField,txt: "BOTTOM")
+        
+        if (meme != nil)
+        {
+           // editing exist meme
+            setTextFieldValue(TxtField: topTextField,txt: meme.topText!)
+            setTextFieldValue(TxtField: bottomTextField,txt: meme.bottomText!)
+            imagePickerView.image = meme.originalImage
+            // disabling share button until user pick an image
+            shareButton.isEnabled = true
+        }
+        else {
+            // add new meme
+           setTextFieldValue(TxtField: topTextField,txt: "TOP")
+            setTextFieldValue(TxtField: bottomTextField,txt: "BOTTOM")
+            // disabling share button until user pick an image
+            shareButton.isEnabled = false
+            
+        }
        
-        // disabling share button until user pick an image
-         shareButton.isEnabled = false
+        
     }
     override func viewWillAppear(_ animated: Bool) {
         
@@ -155,9 +166,14 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
         view.frame.origin.y = 0
     }
     
+    
     func save() {
         // Create the meme
         let meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, originalImage: imagePickerView.image!, memedImage: memedImg)
+        // add meme array to application delegate
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.memes.append(meme)
+        print("append complete")
     }
     
     func generateMemedImage() -> UIImage {
@@ -194,6 +210,7 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
             }
              // activity complete
             self.save()
+            self.dismiss(animated: true, completion: nil)
       
         }
         self.present(controller, animated: true, completion: nil)
@@ -201,10 +218,8 @@ class MemeEditorViewController : UIViewController , UIImagePickerControllerDeleg
     
     // cancel buttom action will reset intial value of text fields and image view
    @IBAction func cancel(_ sender: Any) {
-      topTextField.text = "TOP"
-    bottomTextField.text = "BOTTOM"
-    imagePickerView.image = nil
-   shareButton.isEnabled = false
+
+    dismiss(animated: true, completion: nil)
     }
     
 
