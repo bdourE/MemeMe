@@ -25,7 +25,6 @@ class SentMemesTableViewController: UIViewController, UITableViewDataSource, UIT
     }
     
     override func viewWillAppear(_ animated: Bool) {
-     
         // update table
         tableView.reloadData()
     }
@@ -36,15 +35,11 @@ class SentMemesTableViewController: UIViewController, UITableViewDataSource, UIT
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
-        
         let cell =  tableView.dequeueReusableCell(withIdentifier: "CustomMemeTableCell",
-                                                      for: indexPath)
+                                                for: indexPath)
         let meme = self.memes[(indexPath as NSIndexPath).row]
-        
         // Set text
         cell.textLabel?.text = meme.topText! + " ... " + meme.bottomText!
-        
        // resize mamed Image and set to image view
         let rect = CGRect(x: 0, y: 0, width: 100, height: 100)
         // Actually do the resizing to the rect using the ImageContext stuff
@@ -52,32 +47,21 @@ class SentMemesTableViewController: UIViewController, UITableViewDataSource, UIT
         meme.memedImage?.draw(in: rect)
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-
         cell.imageView?.image  = newImage
-       
-  
-        
-        return cell
+         return cell
     }
     // fixed hieght for row
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    
-        return 100;
-        
+        return 100
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         // Grab the DetailVC from Storyboard
         let detailController = self.storyboard!.instantiateViewController(withIdentifier: "MemeDetailViewController") as! MemeDetailViewController
-        
         //Populate view controller with data from the selected item
         detailController.meme = memes[(indexPath as NSIndexPath).row]
-        
         // Present the view controller using navigation
         navigationController!.pushViewController(detailController, animated: true)
-
-        
-    }
+          }
 }
 
